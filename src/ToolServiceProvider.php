@@ -13,6 +13,12 @@ class ToolServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
+        if ($this->app->runningInConsole()) {
+            $this->publishes([
+                __DIR__.'/../public/vendor/webauthn' => $this->app->publicPath('vendor/webauthn'),
+            ], 'js');
+        }
+
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'nova-webauthn');
 
         $this->app->booted(function () {

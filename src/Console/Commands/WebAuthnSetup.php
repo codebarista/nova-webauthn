@@ -39,7 +39,6 @@ class WebAuthnSetup extends Command
         $tags = [
             'controllers',
             'migrations',
-            'js',
         ];
 
         foreach ($tags as $tag) {
