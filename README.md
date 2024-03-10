@@ -18,6 +18,9 @@ the [Laragear Setup Guide](https://github.com/Laragear/WebAuthn?tab=readme-ov-fi
 php artisan codebarista:webauthn-setup
 ```
 
+**Copy or move** `resources/js/vendor/webauthn/webauthn.js`
+to `public/vendor/webauthn/webauthn.js`
+
 ## 3. Implementation
 
 Add the `WebAuthnAuthenticatable` contract and the `WebAuthnAuthentication` trait to the User class, or any other that
