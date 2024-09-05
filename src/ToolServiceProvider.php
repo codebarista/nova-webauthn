@@ -3,23 +3,19 @@
 namespace Codebarista\NovaWebauthn;
 
 use Codebarista\NovaWebauthn\Console\Commands\WebAuthnSetup;
+use Codebarista\NovaWebauthn\Http\Controllers\WebAuthnLoginController;
+use Codebarista\NovaWebauthn\Http\Controllers\WebAuthnRegisterController;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
-use Laragear\WebAuthn\WebAuthn;
+use Laragear\WebAuthn\Http\Routes as WebAuthnRoutes;
 use Laravel\Nova\Nova;
 
 class ToolServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
-        if ($this->app->runningInConsole()) {
-            $this->publishes([
-                __DIR__.'/../public/vendor/webauthn' => $this->app->publicPath('vendor/webauthn'),
-            ], 'js');
-        }
-
-        $this->loadViewsFrom(__DIR__.'/../resources/views', 'nova-webauthn');
+        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'nova-webauthn');
 
         $this->app->booted(function () {
             $this->config();
@@ -27,10 +23,10 @@ class ToolServiceProvider extends ServiceProvider
         });
 
         Nova::serving(static function () {
-            $localeFile = lang_path('vendor/nova-webauthn/'.app()->getLocale().'.json');
+            $localeFile = lang_path('vendor/nova-webauthn/' . app()->getLocale() . '.json');
 
-            Nova::script('nova-webauthn', __DIR__.'/../dist/js/tool.js');
-            Nova::style('nova-webauthn', __DIR__.'/../dist/css/tool.css');
+            Nova::script('nova-webauthn', __DIR__ . '/../dist/js/tool.js');
+            Nova::style('nova-webauthn', __DIR__ . '/../dist/css/tool.css');
 
             if (File::exists($localeFile)) {
                 Nova::translations($localeFile);
@@ -51,12 +47,15 @@ class ToolServiceProvider extends ServiceProvider
             return;
         }
 
-        $prefix = trim(config('nova.path'), '/').'/webauthn';
+        $prefix = trim(config('nova.path'), '/') . '/webauthn';
 
         Route::middleware(['nova'])->prefix($prefix)
-            ->group(__DIR__.'/../routes/web.php');
+            ->group(__DIR__ . '/../routes/web.php');
 
-        WebAuthn::routes();
+        WebAuthnRoutes::register(
+            attestController: WebAuthnRegisterController::class,
+            assertController: WebAuthnLoginController::class,
+        );
     }
 
     protected function config(): void
@@ -66,7 +65,7 @@ class ToolServiceProvider extends ServiceProvider
         config([
             'auth.providers.users.driver' => 'eloquent-webauthn',
             'auth.providers.users.password_fallback' => true,
-            'nova.routes.login' => $path.'/webauthn/login',
+            'nova.routes.login' => $path . '/webauthn/login',
         ]);
     }
 }

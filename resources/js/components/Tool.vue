@@ -1,15 +1,15 @@
 <template>
-    <LoadingView v-if="isCurrentUser()" :loading="false">
-        <heading class="mb-6">{{ __('Passkey Authentication') }}</heading>
-        <Card>
-            <div class="p-4">
-                <p class="mb-4">
-                    {{ __('Authenticate with fingerprints, patterns and biometric data.') }}
-                </p>
-                <form id="register-form">
-                    <button type="submit"
-                            @click="register"
-                            class="border text-left appearance-none cursor-pointer rounded
+  <LoadingView v-if="isCurrentUser()" :loading="false">
+    <heading class="mb-6">{{ __('Passkey Authentication') }}</heading>
+    <Card>
+      <div class="p-4">
+        <p class="mb-4">
+          {{ __('Authenticate with fingerprints, patterns and biometric data.') }}
+        </p>
+        <form id="register-form">
+          <button type="submit"
+                  @click="register"
+                  class="border text-left appearance-none cursor-pointer rounded
                             text-sm font-bold focus:outline-none focus:ring ring-primary-200
                             dark:ring-gray-600 relative disabled:cursor-not-allowed inline-flex
                             items-center justify-center shadow h-9 px-3 bg-primary-500
@@ -19,35 +19,55 @@
                         <span class="flex items-center gap-1">
                             <span>{{ __('Register Passkey') }}</span>
                         </span>
-                    </button>
-                </form>
-            </div>
-        </Card>
-    </LoadingView>
+          </button>
+        </form>
+      </div>
+    </Card>
+  </LoadingView>
 </template>
 
-<script>
-export default {
-    props: ['resourceName', 'resourceId', 'panel'],
-    setup() {
-        if (typeof WebAuthn === 'undefined') {
-            const src = new URL('vendor/webauthn/webauthn.js', location.origin);
-            const script = document.createElement('script')
-            script.setAttribute('src', src)
-            document.head.appendChild(script)
-        }
-    },
-    methods: {
-        isCurrentUser: function () {
-            return ~~this.resourceId === ~~this.$store.state.currentUser.id
-        },
-        register: function (event) {
-            event.preventDefault()
+<script async>
+import Webpass from '@laragear/webpass/dist/webpass';
 
-            new WebAuthn().register()
-                .then(response => alert('Registration successful.'))
-                .catch(error => alert('Something went wrong.'))
+const webpass = Webpass.create({
+  routes: {
+    attestOptions: 'webauthn/register/options',
+    attest: 'webauthn/register',
+  },
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+    'X-CSRF-TOKEN': document.head.querySelector(
+        'meta[name="csrf-token"]').content
+  }
+})
+
+export default {
+  props: ['resourceName', 'resourceId', 'panel'],
+
+  methods: {
+    isCurrentUser: function () {
+      return ~~this.resourceId === ~~this.$store.state.currentUser.id
+    },
+    async register(e) {
+      e.preventDefault()
+
+      if (Webpass.isUnsupported()) {
+        alert('Your browser does not support WebAuthn.')
+        return;
+      }
+
+      await webpass.attest().then(response => {
+        if (response.success) {
+          Nova.success('Registration successful')
+        } else {
+          Nova.error('Something went wrong')
         }
+      }).catch(error => {
+        Nova.error(error.message)
+      })
+
     }
+  }
 }
 </script>

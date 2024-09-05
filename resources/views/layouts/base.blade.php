@@ -16,12 +16,9 @@
     <!-- Styles -->
     <link rel="stylesheet" href="{{ mix('app.css', 'vendor/nova') }}">
 
-    @if ($styles = \Laravel\Nova\Nova::availableStyles(request()))
-        <!-- Tool Styles -->
-        @foreach($styles as $asset)
-            <link rel="stylesheet" href="{!! $asset->url() !!}">
-        @endforeach
-    @endif
+    <style>
+        {{ Nova::brandColorsCSS() }}
+    </style>
 
     <script>
         if (localStorage.novaTheme === 'dark' || (!('novaTheme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {

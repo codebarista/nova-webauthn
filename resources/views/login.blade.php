@@ -60,13 +60,38 @@
 
 @endsection
 @push('js')
-    <script src="{{ asset('vendor/webauthn/webauthn.js') }}"></script>
-    <script>
-        const login = event => {
+    <script src="https://cdn.jsdelivr.net/npm/@laragear/webpass@2/dist/webpass.js"></script>
+    <script async>
+        const webpass = Webpass.create({
+            routes: {
+                assertOptions: 'webauthn/login/options',
+                assert: 'webauthn/login',
+            },
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-CSRF-TOKEN': document.head.querySelector(
+                    'meta[name="csrf-token"]').content
+            }
+        })
+
+        const login = async event => {
             event.preventDefault()
 
-            new WebAuthn().login().then(response => location.replace('{{ Laravel\Nova\Nova::url('/') }}'))
-                .catch(error => alert('Something went wrong. Try again or log in with password!'))
+            if (Webpass.isUnsupported()) {
+                alert('Your browser does not support WebAuthn.')
+                return;
+            }
+
+            await webpass.assert().then(response => {
+                if (response.success) {
+                    window.location.replace('{{ Laravel\Nova\Nova::url('/') }}')
+                } else {
+                    alert('Something went wrong. Try again or log in with password!')
+                }
+            }).catch(error => {
+                console.log(error.message)
+            })
         }
 
         document.getElementById('nova-webauthn-form').addEventListener('submit', login)

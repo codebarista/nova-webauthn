@@ -37,8 +37,7 @@ class WebAuthnSetup extends Command
     {
         $command = 'vendor:publish';
         $tags = [
-            'controllers',
-            'migrations',
+            'migrations'
         ];
 
         foreach ($tags as $tag) {

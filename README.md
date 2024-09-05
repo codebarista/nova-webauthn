@@ -11,20 +11,13 @@ composer require codebarista/nova-webauthn
 
 ## 2. Setup
 
-Run the following command to publish controllers, migrations, and scripts from steps 1-4 of
-the [Laragear Setup Guide](https://github.com/Laragear/WebAuthn?tab=readme-ov-file#set-up).
+Run the following command to publish and run the Laragear WebAuthn migrations.
 
 ```shell
 php artisan codebarista:webauthn-setup
 ```
 
-## 3. Publish
-
-```shell
-php artisan vendor:publish --tag="js" --provider="Codebarista\NovaWebauthn\ToolServiceProvider"
-```
-
-## 4. Implementation
+## 3. Implementation
 
 Add the `WebAuthnAuthenticatable` contract and the `WebAuthnAuthentication` trait to the User class, or any other that
 uses authentication.
@@ -63,6 +56,8 @@ class User extends Resource
     }
 }
 ```
+
+**Note: Make sure that passkey registration and login are done via a secure https connection.**
 
 ## License
 
