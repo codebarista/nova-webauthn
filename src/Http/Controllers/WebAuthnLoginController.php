@@ -22,6 +22,12 @@ class WebAuthnLoginController
 
     public function login(AssertedRequest $request): Response
     {
-        return response()->noContent($request->login() ? 204 : 422);
+        $login = $request->login();
+
+        if ($login && $var = config('nova-webauthn.session.disable_2fa_var')) {
+            $request->session()->put($var, true);
+        }
+
+        return response()->noContent($login ? 204 : 422);
     }
 }

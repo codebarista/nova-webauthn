@@ -36,6 +36,8 @@ class ToolServiceProvider extends ServiceProvider
 
     public function register(): void
     {
+        $this->mergeConfigFrom(__DIR__ . '/../config/nova-webauthn.php', 'nova-webauthn');
+
         $this->commands([
             WebAuthnSetup::class,
         ]);
