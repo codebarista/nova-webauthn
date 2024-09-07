@@ -3,6 +3,8 @@
 [Laragear WebAuthn](https://github.com/Laragear/WebAuthn) implementation for Laravel Nova to authenticate users with
 passkeys: fingerprints, patterns and biometrics.
 
+![Laravel Nova Passkey Login](https://github.com/user-attachments/assets/a785a28d-1580-4fc9-8f39-b9cb07442d77)
+
 ## 1. Installation
 
 ```shell
@@ -58,6 +60,8 @@ class User extends Resource
 ```
 
 **Note: Make sure that passkey registration and login are done via a secure https connection.**
+
+![Laravel Nova Passkey Registration](https://github.com/user-attachments/assets/6234d24b-666c-4c10-a8db-0e0c28838373)
 
 ## License
 
