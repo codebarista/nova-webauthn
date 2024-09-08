@@ -49,7 +49,7 @@ class ToolServiceProvider extends ServiceProvider
             return;
         }
 
-        $prefix = trim(config('nova.path'), '/') . '/webauthn';
+        $prefix = trim(config('nova.path'), '/') . '/authn';
 
         Route::middleware(['nova'])->prefix($prefix)
             ->group(__DIR__ . '/../routes/web.php');
@@ -67,7 +67,7 @@ class ToolServiceProvider extends ServiceProvider
         config([
             'auth.providers.users.driver' => 'eloquent-webauthn',
             'auth.providers.users.password_fallback' => true,
-            'nova.routes.login' => $path . '/webauthn/login',
+            'nova.routes.login' => $path . '/authn',
         ]);
     }
 }
