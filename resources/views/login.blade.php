@@ -61,7 +61,7 @@
 @endsection
 
 @push('js')
-    <script src="https://cdn.jsdelivr.net/npm/@laragear/webpass@2/dist/webpass.js"></script>
+    <script src="{{ asset('vendor/nova-webauthn/laragear/webpass.js') }}"></script>
     <script async>
         const webpass = Webpass.create({
             routes: {

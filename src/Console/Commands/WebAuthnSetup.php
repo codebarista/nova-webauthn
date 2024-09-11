@@ -2,6 +2,7 @@
 
 namespace Codebarista\NovaWebauthn\Console\Commands;
 
+use Codebarista\NovaWebauthn\ToolServiceProvider;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Schema;
 use Laragear\WebAuthn\WebAuthnServiceProvider;
@@ -20,6 +21,8 @@ class WebAuthnSetup extends Command
 
     public function handle(): int
     {
+        $this->publishPublicVendorScripts();
+
         if (Schema::hasTable('webauthn_credentials')) {
             $this->components->info('Laragear WebAuthn is already there.');
 
@@ -33,11 +36,19 @@ class WebAuthnSetup extends Command
         return self::SUCCESS;
     }
 
+    public function publishPublicVendorScripts(): void
+    {
+        $this->call('vendor:publish', [
+            '--provider' => ToolServiceProvider::class,
+            '--tag' => 'public',
+        ]);
+    }
+
     private function publishLaragearWebAuthn(): void
     {
         $command = 'vendor:publish';
         $tags = [
-            'migrations'
+            'migrations',
         ];
 
         foreach ($tags as $tag) {
