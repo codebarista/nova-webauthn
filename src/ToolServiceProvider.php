@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Laragear\WebAuthn\Http\Routes as WebAuthnRoutes;
 use Laravel\Nova\Nova;
+use Laravel\Nova\PendingRouteRegistration;
 
 class ToolServiceProvider extends ServiceProvider
 {
@@ -50,10 +51,18 @@ class ToolServiceProvider extends ServiceProvider
             return;
         }
 
-        $prefix = trim(config('nova.path'), '/').'/authn';
+        $authnPath = Nova::path().'/authn';
 
-        Route::middleware(['nova'])->prefix($prefix)
+        Route::middleware(['nova'])->prefix($authnPath)
             ->group(__DIR__.'/../routes/web.php');
+
+        // set Nova 5 login and also default logout routes
+        if(method_exists(PendingRouteRegistration::class, 'withoutAuthenticationRoutes')) {
+            Nova::routes()->withoutAuthenticationRoutes(
+                logout: Nova::path().'/logout',
+                login: $authnPath
+            );
+        }
 
         WebAuthnRoutes::register(
             attestController: WebAuthnRegisterController::class,
@@ -63,12 +72,13 @@ class ToolServiceProvider extends ServiceProvider
 
     protected function config(): void
     {
-        $path = rtrim(config('nova.path'), '/');
+        $authnPath = Nova::path().'/authn';
 
         config([
             'auth.providers.users.driver' => 'eloquent-webauthn',
             'auth.providers.users.password_fallback' => true,
-            'nova.routes.login' => $path.'/authn',
+            'nova.routes.login' => $authnPath, // Nova 4
+            'fortify.paths.login' => $authnPath, // Nova 5
         ]);
     }
 }
