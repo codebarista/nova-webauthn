@@ -35,7 +35,7 @@
                 </div>
                 <div class="flex mb-6">
                     <input type="checkbox" id="remember" tabindex="0" class="h-4 w-4 inline-flex">
-                    <label for="remember" class="pl-3">{{ __('Remember me') }}</label>
+                    <label for="remember" class="ml-3">{{ __('Remember me') }}</label>
                     @if(Nova::withPasswordReset())
                     <div class="ml-auto">
                         <a class="text-gray-500 font-bold no-underline"
