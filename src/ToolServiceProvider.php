@@ -24,6 +24,14 @@ class ToolServiceProvider extends ServiceProvider
             $this->routes();
         });
 
+        // set Nova 5 login and also default logout routes
+        if (method_exists(PendingRouteRegistration::class, 'withoutAuthenticationRoutes')) {
+            Nova::routes()->withoutAuthenticationRoutes(
+                login: $this->authnPath(),
+                logout: Nova::path().'/logout'
+            );
+        }
+
         Nova::serving(static function () {
             $localeFile = lang_path('vendor/nova-webauthn/'.app()->getLocale().'.json');
 
@@ -51,18 +59,8 @@ class ToolServiceProvider extends ServiceProvider
             return;
         }
 
-        $authnPath = Nova::path().'/authn';
-
-        Route::middleware(['nova'])->prefix($authnPath)
+        Route::middleware(['nova'])->prefix($this->authnPath())
             ->group(__DIR__.'/../routes/web.php');
-
-        // set Nova 5 login and also default logout routes
-        if(method_exists(PendingRouteRegistration::class, 'withoutAuthenticationRoutes')) {
-            Nova::routes()->withoutAuthenticationRoutes(
-                logout: Nova::path().'/logout',
-                login: $authnPath
-            );
-        }
 
         WebAuthnRoutes::register(
             attestController: WebAuthnRegisterController::class,
@@ -72,13 +70,16 @@ class ToolServiceProvider extends ServiceProvider
 
     protected function config(): void
     {
-        $authnPath = Nova::path().'/authn';
-
         config([
             'auth.providers.users.driver' => 'eloquent-webauthn',
             'auth.providers.users.password_fallback' => true,
-            'nova.routes.login' => $authnPath, // Nova 4
-            'fortify.paths.login' => $authnPath, // Nova 5
+            'nova.routes.login' => $this->authnPath(), // Nova 4
+            'fortify.paths.login' => $this->authnPath(), // Nova 5
         ]);
+    }
+
+    protected function authnPath(): string
+    {
+        return Nova::path().'/authn';
     }
 }
