@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Laragear\WebAuthn\Http\Routes as WebAuthnRoutes;
 use Laravel\Nova\Nova;
-use Laravel\Nova\PendingRouteRegistration;
 
 class ToolServiceProvider extends ServiceProvider
 {
@@ -24,19 +23,11 @@ class ToolServiceProvider extends ServiceProvider
             $this->routes();
         });
 
-        // set Nova 5 login and also default logout routes
-        if (method_exists(PendingRouteRegistration::class, 'withoutAuthenticationRoutes')) {
-            Nova::routes()->withoutAuthenticationRoutes(
-                login: $this->authnPath(),
-                logout: Nova::path().'/logout'
-            );
-        }
-
         Nova::serving(static function () {
-            $localeFile = lang_path('vendor/nova-webauthn/'.app()->getLocale().'.json');
+            $localeFile = lang_path('vendor/nova-webauthn/' . app()->getLocale() . '.json');
 
-            Nova::script('nova-webauthn', __DIR__.'/../dist/js/tool.js');
-            Nova::style('nova-webauthn', __DIR__.'/../dist/css/tool.css');
+            Nova::script('nova-webauthn', __DIR__ . '/../dist/js/tool.js');
+            Nova::style('nova-webauthn', __DIR__ . '/../dist/css/tool.css');
 
             if (File::exists($localeFile)) {
                 Nova::translations($localeFile);
@@ -46,7 +37,7 @@ class ToolServiceProvider extends ServiceProvider
 
     public function register(): void
     {
-        $this->mergeConfigFrom(__DIR__.'/../config/nova-webauthn.php', 'nova-webauthn');
+        $this->mergeConfigFrom(__DIR__ . '/../config/nova-webauthn.php', 'nova-webauthn');
 
         $this->commands([
             WebAuthnSetup::class,
@@ -59,8 +50,8 @@ class ToolServiceProvider extends ServiceProvider
             return;
         }
 
-        Route::middleware(['nova'])->prefix($this->authnPath())
-            ->group(__DIR__.'/../routes/web.php');
+        Route::middleware(['nova'])->prefix(Nova::path())
+            ->group(__DIR__ . '/../routes/web.php');
 
         WebAuthnRoutes::register(
             attestController: WebAuthnRegisterController::class,
@@ -73,13 +64,6 @@ class ToolServiceProvider extends ServiceProvider
         config([
             'auth.providers.users.driver' => 'eloquent-webauthn',
             'auth.providers.users.password_fallback' => true,
-            'nova.routes.login' => $this->authnPath(), // Nova 4
-            'fortify.paths.login' => $this->authnPath(), // Nova 5
         ]);
-    }
-
-    protected function authnPath(): string
-    {
-        return Nova::path().'/authn';
     }
 }

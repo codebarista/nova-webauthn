@@ -2,4 +2,4 @@
 
 use Illuminate\Support\Facades\Route;
 
-Route::view('/', 'nova-webauthn::login');
+Route::view('login', 'nova-webauthn::login')->name('nova.login');
