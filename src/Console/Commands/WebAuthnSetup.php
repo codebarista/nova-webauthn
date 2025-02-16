@@ -58,6 +58,13 @@ class WebAuthnSetup extends Command
             ]);
         }
 
+        foreach ($tags as $tag) {
+            $this->call($command, [
+                '--provider' => ToolServiceProvider::class,
+                '--tag' => $tag,
+            ]);
+        }
+
         $this->call('migrate');
     }
 }

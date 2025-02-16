@@ -15,7 +15,10 @@ class ToolServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
+        $this->publishesMigrations([__DIR__.'/../database/migrations' => database_path('migrations')]);
+
         $this->publishes([__DIR__.'/../public' => public_path('vendor/nova-webauthn')], 'public');
+
         $this->loadViewsFrom(__DIR__.'/../resources/views', 'nova-webauthn');
 
         $this->app->booted(function () {
@@ -24,10 +27,10 @@ class ToolServiceProvider extends ServiceProvider
         });
 
         Nova::serving(static function () {
-            $localeFile = lang_path('vendor/nova-webauthn/' . app()->getLocale() . '.json');
+            $localeFile = lang_path('vendor/nova-webauthn/'.app()->getLocale().'.json');
 
-            Nova::script('nova-webauthn', __DIR__ . '/../dist/js/tool.js');
-            Nova::style('nova-webauthn', __DIR__ . '/../dist/css/tool.css');
+            Nova::script('nova-webauthn', __DIR__.'/../dist/js/tool.js');
+            Nova::style('nova-webauthn', __DIR__.'/../dist/css/tool.css');
 
             if (File::exists($localeFile)) {
                 Nova::translations($localeFile);
@@ -37,7 +40,7 @@ class ToolServiceProvider extends ServiceProvider
 
     public function register(): void
     {
-        $this->mergeConfigFrom(__DIR__ . '/../config/nova-webauthn.php', 'nova-webauthn');
+        $this->mergeConfigFrom(__DIR__.'/../config/nova-webauthn.php', 'nova-webauthn');
 
         $this->commands([
             WebAuthnSetup::class,
@@ -51,7 +54,7 @@ class ToolServiceProvider extends ServiceProvider
         }
 
         Route::middleware(['nova'])->prefix(Nova::path())
-            ->group(__DIR__ . '/../routes/web.php');
+            ->group(__DIR__.'/../routes/web.php');
 
         WebAuthnRoutes::register(
             attestController: WebAuthnRegisterController::class,
