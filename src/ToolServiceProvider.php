@@ -15,7 +15,7 @@ class ToolServiceProvider extends ServiceProvider
 {
     public function boot(): void
     {
-        $this->publishesMigrations([__DIR__.'/../database/migrations' => database_path('migrations')]);
+        $this->publishesMigrations([__DIR__.'/../database/migrations' => database_path('migrations')], 'migrations');
 
         $this->publishes([__DIR__.'/../public' => public_path('vendor/nova-webauthn')], 'public');
 
