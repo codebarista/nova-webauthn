@@ -20,7 +20,7 @@
     ],
     "require": {
         "php": "^8.3",
-        "laragear/webauthn": "^3.0",
+        "laragear/webauthn": "^4.0",
         "laravel/nova": "^5.0"
     },
     "autoload": {
